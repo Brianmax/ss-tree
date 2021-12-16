@@ -689,10 +689,21 @@ int main()
             cout<<"Ingrese el item para buscar"<<endl;
             int item = 0;
             cin>>item;
-            cout<<"Item a buscar"<<endl;
+            cout<<"Elementos encontrado por la funcion knn de la estructura"<<endl;
+            float inf = numeric_limits<float>::max();
+            queue<pair<float, vector<float>>> kn;
+            knn(sstree1.root, mnist[item], inf,kn,10);
+            cout<<"Item a consultar"<<endl;
             print_mnist(mnist[item]);
-            cout<<"Elemento encontrado por la funcion search de la estructura"<<endl;
-            sstree1.search(sstree1.root, mnist[item]);
+            cout<<"------------------------------------"<<endl;
+            for(int i = 0; i < 10; i++)
+            {
+                pair<float, vector<float>> p;
+                p = kn.front();
+                kn.pop();
+                print_mnist(p.second);
+                cout<<endl;
+            }
             cout<<"Desea continuar?(0/1)"<<endl;
             cin>>newOption;
         }
