@@ -1,76 +1,48 @@
+import youtube_dl
 import discord
-import clave
-import random
 from discord.ext import commands
 
-bot = commands.Bot(command_prefix=">", description="Es un Bot de ayuda.")
-n = 0
-contador = 1
-intentos = 10
-palabra = ""
-lista_letras = []
+class music(commands.Cog):
 
+    def __init__(self,client):
+        self.client = client
 
-@bot.command()
-async def adivina(contexto):
-    global n
-    n = random.randint(1, 10)
-    await contexto.send("Adivina un numero entre 1 y 10.")
-
-    print(n)
-
-
-@bot.command()
-async def num(contexto, num):
-    global contador
-    if num.isdigit():
-        if int(num) != n:
-            await contexto.send("Número equivocado")
-            contador += 1
+    @commands.command()
+    async def join(self,contexto):
+        if contexto.author.voice is None:
+            await contexto.send("No estás en un canal de voz!")
+        voice_channel = contexto.author.voice.channel
+        if contexto.voice_client is None:
+            await voice_channel.connect()
         else:
-            await contexto.send("Felicidades, adivinaste el número en el intento {}".format(contador))
-    else:
-        await contexto.send("¡Ingrese un número!")
+            await contexto.voice_client.move_to(voice_channel)
+
+    @commands.command()
+    async def disconnect(self,contexto):
+        await contexto.voice_client.disconnect()
+
+    @commands.command()
+    async def play(self, contexto, url):
+        contexto.voice_client.stop()
+        FFMPEG_OPTIONS = {"before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5","options": "-vn"}
+        YDL_OPTIONS = {"format": "bestaudio"}
+        vc = contexto.voice_client
+        #url = url[1:-1]
+        with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
+            info = ydl.extract_info(url, download=False)
+            url2 = info["formats"][0]["url"]
+            vc.play(discord.FFmpegPCMAudio(executable="C:/webm/bin/ffmpeg.exe", source=url2, **FFMPEG_OPTIONS))
 
 
-lista = ["Juventus", "Madrid", "Barcelona", "Manchester"]
+    @commands.command()
+    async def pause(self, contexto):
+        await contexto.voice_client.pause()
 
 
-@bot.command()
-async def adivinaPalabras(contexto):
-    global palabra
-    global lista_letras
-    palabra = random.choice(lista)
-    lista_letras = []
-    await contexto.send("La palabra a adivinar tiene {} letras.".format(len(palabra)))
+    @commands.command()
+    async def resume(self, contexto):
+        await contexto.voice_client.resume()
 
 
-@bot.command()
-async def letra(contexto, ltr):
-    global intentos
-    global lista_letras
-    status = ""
-    if ltr.isalpha():
-        lista_letras.append(ltr)
-        if ltr in palabra:
-            await contexto.send("La letra si esta en la palabra")
-        else:
-            intentos = intentos - 1
-            await contexto.send("La letra no esta en la palabra")
-    else:
-        await contexto.send("Ingresa una letra!")
-
-    for letra in palabra:
-        if letra in lista_letras:
-            status = status + letra
-        else:
-            status = status + "* "
-    if status == palabra:
-        await contexto.send("Felicidades, ganaste!")
-    else:
-        if intentos != 0:
-            await contexto.send(status)
-        else:
-            await contexto.send("Ya no te quedan mas intentos")
-
-bot.run(clave.tok)
+def setup(client):
+    client.add_cog(music(client))
