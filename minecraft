@@ -1,31 +1,24 @@
-from ursina import *
-from ursina.prefabs.first_person_controller import FirstPersonController
-app = Ursina()
+import time
+import random
 
-grass_texture = load_texture('textures/grass_block.png')
-stone_texture = load_texture('textures/stone_block.png')
-brick_texture = load_texture('textures/brick_block.png')
-dirt_texture = load_texture('textures/dirt_block.png')
+#Crear una lista de números enteros.
+def listaNum(start, end):
+  lista = []
 
-class Player(Entity):
-    def update(self):
-        self.direction = Vec3(self.right * (held_keys['d'] - held_keys['a'])).normalized()
-        self.position += self.direction * 5 * time.dt
+  for x in range(start,end+1):
+    lista.append(x)
 
-class Voxel(Button):
-    def __init__(self, position = (0,0,0), texture=grass_texture):
-        super().__init__(parent=scene,
-        position = position,
-        model = "textures/block",
-        origin_y = 0.5,
-        texture = texture,
-        color = color.color(0,0,random.uniform(0.9,1)),
-        scale = 0.5
-        )
+  return lista
 
-for z in range(20):
-    for x in range(20):
-        voxel = Voxel(position=(x,0,z))
-player = FirstPersonController()
 
-app.run()
+def Cartillas(inicio, fin, cantidad): #parámetros: inicio y final de la lista
+                                            # y cantidad de números elegidos
+
+    lista = listaNum(inicio, fin)     #crear una lista de números para un grupo específico
+    listaNueva = []
+    for x in range(cantidad):
+        a = random.randint(0,len(lista)-1)  #Elegir un índice al azar de la lista
+        n = lista[a]                  #Escoger el elemento de la lista correspondiente a dicho índice
+        listaNueva.append(n)          #Añadir el número escogida a la lista nueva.
+        lista.pop(a)                  #Eliminar dicho elemento de la lista.
+    print(listaNueva)                 #Imprimir la lista nueva.
