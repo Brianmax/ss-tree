@@ -1,28 +1,26 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <math.h>
 #include <iostream>
 
 using namespace std;
-void processInput(GLFWwindow *window);
+void processInput(GLFWwindow* window);
 double generate(float points[2160], double angle);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-const char *vertexShaderSource = "#version 330 core\n"
-                                 "layout (location = 0) in vec3 aPos;\n"
-                                 "out vec4 vertexColor;\n"
-                                 "void main()\n"
-                                 "{\n"
-                                 " gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                 "vertexColor = vec4(0.5, 0.0, 0.0, 1.0);\n"
-                                 "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-                                   "out vec4 FragColor;\n"
-                                   "uniform vec4 ourColor;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   FragColor = ourColor;\n"
-                                   "}\n\0";
-
+const char* vertexShaderSource = "#version 330 core\n"
+"layout (location = 0) in vec3 aPos;\n"
+"out vec4 vertexColor;\n"
+"void main()\n"
+"{\n"
+" gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"vertexColor = vec4(0.5, 0.0, 0.0, 1.0);\n"
+"}\0";
+const char* fragmentShaderSource = "#version 330 core\n"
+"out vec4 FragColor;\n"
+"uniform vec4 ourColor;\n"
+"void main()\n"
+"{\n"
+"   FragColor = ourColor;\n"
+"}\n\0";
 
 int main()
 {
@@ -73,35 +71,6 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    /*float vertices[] = {
-            0.0f,  0.6f, 0.0f,
-            0.4f,  0.2f, 0.0f,
-            1.0f,  0.0f, 0.0f,
-
-            0.4f,  -0.2f, 0.0f,
-            0.0f,  -0.6f, 0.0f,
-            -0.4f,  -0.2f, 0.0f,
-            -1.0f,  0.0f, 0.0f,
-            -0.4f,  0.2f, 0.0f/*
-
-            //-0.2f,  0.0f, 0.0f,
-            //0.2f,  0.0f, 0.0f,
-            //0.0f,  0.4f, 0.0f,
-    };*/
-
-    /*float vertices[] = {
-            0.0f,  1.0f, 0.0f,
-            0.6f,  -0.6f, 0.0f,
-            -0.375f,  0.0f, 0.0f,
-
-            -0.221f,  0.4f, 0.0f,
-            1.0f,  0.4f, 0.0f,
-            -0.6f,  -0.6f, 0.0f,
-
-            -1.0f,  0.4f, 0.0f,
-            1.0f,  0.4f, 0.0f,
-            0.0f,  -0.22f, 0.0f,
-            };*/
     float vertices1[2160] = {};
     float vertices2[2160] = {};
     float vertices3[2160] = {};
@@ -119,7 +88,7 @@ int main()
     angle = generate(vertices6, angle);
     angle = generate(vertices7, angle);
     angle = generate(vertices8, angle);
-
+   
     unsigned int VBO1, VAO1;
     glGenVertexArrays(1, &VAO1);
     glGenBuffers(1, &VBO1);
@@ -160,6 +129,7 @@ int main()
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
+   
     unsigned int VBO5, VAO5;
     glGenVertexArrays(1, &VAO5);
     glGenBuffers(1, &VBO5);
@@ -171,7 +141,7 @@ int main()
     glBindVertexArray(0);
 
     unsigned int VBO6, VAO6;
-    glGenVertexArrays(1, &VAO5);
+    glGenVertexArrays(1, &VAO6);
     glGenBuffers(1, &VBO6);
     glBindVertexArray(VAO6);
     glBindBuffer(GL_ARRAY_BUFFER, VBO6);
@@ -180,55 +150,92 @@ int main()
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
+    unsigned int VBO7, VAO7;
+    glGenVertexArrays(1, &VAO7);
+    glGenBuffers(1, &VBO7);
+    glBindVertexArray(VAO7);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO7);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices7), vertices7, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
+
+
+    unsigned int VBO8, VAO8;
+    glGenVertexArrays(1, &VAO8);
+    glGenBuffers(1, &VBO8);
+    glBindVertexArray(VAO8);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO8);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices8), vertices8, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
+
 
     glPointSize(8);
-    glLineWidth(2);
+    glLineWidth(5);
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+        glClearColor(0.8f, 0.5f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
 
         glUseProgram(shaderProgram);
 
         float greenValue = sin(0.5) / 2.0f + 0.5f;
         int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
         glBindVertexArray(VAO1);
         glDrawArrays(GL_LINES, 0, 2160);
+        
 
-        greenValue = sin(56) / 2.0f + 0.5f;
+        greenValue = sin(18) / 2.0f + 0.5f;
         vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glBindVertexArray(VAO2);
         glDrawArrays(GL_LINES, 0, 2160);
 
-        greenValue = sin(6) / 2.0f + 0.5f;
+        greenValue = sin(28) / 2.0f + 0.5f;
         vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glBindVertexArray(VAO3);
         glDrawArrays(GL_LINES, 0, 2160);
 
-        greenValue = sin(18) / 2.0f + 0.5f;
+
+        greenValue = sin(38) / 2.0f + 0.5f;
         vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glBindVertexArray(VAO4);
         glDrawArrays(GL_LINES, 0, 2160);
-        glfwSwapBuffers(window);
-        glfwPollEvents();
 
-        greenValue = sin(0.5) / 2.0f + 0.5f;
+
+        greenValue = sin(48) / 2.0f + 0.5f;
         vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glBindVertexArray(VAO5);
         glDrawArrays(GL_LINES, 0, 2160);
 
-        greenValue = sin(6) / 2.0f + 0.5f;
+        greenValue = sin(58) / 2.0f + 0.5f;
         vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glBindVertexArray(VAO6);
         glDrawArrays(GL_LINES, 0, 2160);
 
+
+        greenValue = sin(68) / 2.0f + 0.5f;
+        vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        glBindVertexArray(VAO7);
+        glDrawArrays(GL_LINES, 0, 2160);
+
+        greenValue = sin(88) / 2.0f + 0.5f;
+        vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        glBindVertexArray(VAO8);
+        glDrawArrays(GL_LINES, 0, 2160);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -241,7 +248,7 @@ int main()
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
-void processInput(GLFWwindow *window) {
+void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }
@@ -249,15 +256,15 @@ void processInput(GLFWwindow *window) {
 double generate(float vertices1[2160], double angle)
 {
 
-    for(int i = 0; i < 2160; i=i+6)
+    for (int i = 0; i < 2160; i = i + 6)
     {
-        vertices1[i] = 0; vertices1[i+1] = 0; vertices1[i+2] = 0;
-        float ans1 = (-sinf(angle)*0.6f);
-        float ans2 = (-cosf(angle)*0.6f);
+        vertices1[i] = 0; vertices1[i + 1] = 0; vertices1[i + 2] = 0;
+        float ans1 = (-sinf(angle) * 0.6f);
+        float ans2 = (-cosf(angle) * 0.6f);
         angle = angle + 0.00218;
-        vertices1[i+3] = ans1;
-        vertices1[(i+4)] = ans2;
-        vertices1[(i+5)] = 0.0f;
+        vertices1[i + 3] = ans1;
+        vertices1[(i + 4)] = ans2;
+        vertices1[(i + 5)] = 0.0f;
     }
     return angle;
 }
