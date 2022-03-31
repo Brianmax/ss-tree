@@ -1,3 +1,10 @@
+/*Computacion Grafica 2022-01*/
+/*George Brian Maxi Ccapa
+Teclas: S--> LINE_STRIP
+        P--> PUNTOS
+        L--> LINEA SIMPLE
+        T--> TRIANGUOS
+*/
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -67,35 +74,6 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    /*float vertices[] = {
-            0.0f,  0.6f, 0.0f,
-            0.4f,  0.2f, 0.0f,
-            1.0f,  0.0f, 0.0f,
-
-            0.4f,  -0.2f, 0.0f,
-            0.0f,  -0.6f, 0.0f,
-            -0.4f,  -0.2f, 0.0f,
-            -1.0f,  0.0f, 0.0f,
-            -0.4f,  0.2f, 0.0f/*
-
-            //-0.2f,  0.0f, 0.0f,
-            //0.2f,  0.0f, 0.0f,
-            //0.0f,  0.4f, 0.0f,
-    };*/
-
-    /*float vertices[] = {
-            0.0f,  1.0f, 0.0f,
-            0.6f,  -0.6f, 0.0f,
-            -0.375f,  0.0f, 0.0f,
-
-            -0.221f,  0.4f, 0.0f,
-            1.0f,  0.4f, 0.0f,
-            -0.6f,  -0.6f, 0.0f,
-
-            -1.0f,  0.4f, 0.0f,
-            1.0f,  0.4f, 0.0f,
-            0.0f,  -0.22f, 0.0f,
-            };*/
     float vertices1[] = {
             0.3f,  -0.4f, 0.0f,
             -0.6f,  0.1f, 0.0f,
@@ -110,6 +88,32 @@ int main()
             0.0f,  0.4f, 0.0f,
             0.112f,  0.1f, 0.0f,
             -0.15f,  0.1f, 0.0f
+    };
+
+    float vertices_lineas[] = {
+            0.0f,  0.4f, 0.0f,
+            0.112f,  0.1f, 0.0f,
+            0.6f,  0.1f, 0.0f,
+            0.189f,  -0.104f, 0.0f,
+            0.3f,  -0.4f, 0.0f,
+            -0.033f,  -0.215f, 0.0f,
+            -0.4f,  -0.4f, 0.0f,
+            -0.248,  -0.095f, 0.0f,
+            -0.6f,  0.1f, 0.0f,
+            -0.115f,  0.1f, 0.0f
+    };
+    float vertices_lineas_strip[] = {
+            0.0f,  0.4f, 0.0f,
+            0.112f,  0.1f, 0.0f,
+            0.6f,  0.1f, 0.0f,
+            0.189f,  -0.104f, 0.0f,
+            0.3f,  -0.4f, 0.0f,
+            -0.033f,  -0.215f, 0.0f,
+            -0.4f,  -0.4f, 0.0f,
+            -0.248,  -0.095f, 0.0f,
+            -0.6f,  0.1f, 0.0f,
+            -0.115f,  0.1f, 0.0f,
+            0.0f,  0.4f, 0.0f
     };
     unsigned int VBO1, VAO1;
     glGenVertexArrays(1, &VAO1);
@@ -141,24 +145,59 @@ int main()
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
+    unsigned int VBO4, VAO4;
+    glGenBuffers(1, &VBO4);
+    glGenVertexArrays(1, &VAO4);
+    glBindVertexArray(VAO4);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO4);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_lineas), vertices_lineas, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
+
+    unsigned int VBO5, VAO5;
+    glGenBuffers(1, &VBO5);
+    glGenVertexArrays(1, &VAO5);
+    glBindVertexArray(VAO5);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO5);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_lineas_strip), vertices_lineas_strip, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
+
     glPointSize(8);
     glLineWidth(5);
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
-        glClearColor(0.8f, 0.5f, 0.4f, 1.0f);
+        glClearColor(0.8f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
+        if(glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+            glBindVertexArray(VAO1);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glBindVertexArray(VAO1);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+            glBindVertexArray(VAO2);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glBindVertexArray(VAO2);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+            glBindVertexArray(VAO3);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        }
 
-        glBindVertexArray(VAO3);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        if(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+            glBindVertexArray(VAO4);
+            glDrawArrays(GL_LINE_LOOP, 0, 10);
+        }
+        if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            glBindVertexArray(VAO5);
+            glDrawArrays(GL_LINE_STRIP, 0, 11);
+        }
+
+        if(glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+            glBindVertexArray(VAO5);
+            glDrawArrays(GL_POINTS, 0, 11);
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
