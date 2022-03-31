@@ -1,5 +1,12 @@
+/*Computacion Grafica 2022-01*/
+/*George Brian Maxi Ccapa*/
+/*Teclas a presionar: L--> Lineas
+                      P--> Puntos
+                      H-->Hibrido (Lineas y puntos)
+                      */
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <math.h>
 #include <iostream>
 
 using namespace std;
@@ -88,7 +95,7 @@ int main()
     angle = generate(vertices6, angle);
     angle = generate(vertices7, angle);
     angle = generate(vertices8, angle);
-   
+
     unsigned int VBO1, VAO1;
     glGenVertexArrays(1, &VAO1);
     glGenBuffers(1, &VBO1);
@@ -129,7 +136,7 @@ int main()
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
-   
+
     unsigned int VBO5, VAO5;
     glGenVertexArrays(1, &VAO5);
     glGenBuffers(1, &VBO5);
@@ -183,60 +190,170 @@ int main()
 
 
         glUseProgram(shaderProgram);
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+            float greenValue = sin(0.5) / 2.0f + 0.5f;
+            int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
-        float greenValue = sin(0.5) / 2.0f + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-
-        glBindVertexArray(VAO1);
-        glDrawArrays(GL_LINES, 0, 2160);
-        
-
-        greenValue = sin(18) / 2.0f + 0.5f;
-        vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-        glBindVertexArray(VAO2);
-        glDrawArrays(GL_LINES, 0, 2160);
-
-        greenValue = sin(28) / 2.0f + 0.5f;
-        vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-        glBindVertexArray(VAO3);
-        glDrawArrays(GL_LINES, 0, 2160);
+            glBindVertexArray(VAO1);
+            glDrawArrays(GL_POINTS, 0, 2160);
 
 
-        greenValue = sin(38) / 2.0f + 0.5f;
-        vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-        glBindVertexArray(VAO4);
-        glDrawArrays(GL_LINES, 0, 2160);
+            greenValue = sin(18) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO2);
+            glDrawArrays(GL_POINTS, 0, 2160);
+
+            greenValue = sin(112) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO3);
+            glDrawArrays(GL_POINTS, 0, 2160);
 
 
-        greenValue = sin(48) / 2.0f + 0.5f;
-        vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-        glBindVertexArray(VAO5);
-        glDrawArrays(GL_LINES, 0, 2160);
-
-        greenValue = sin(58) / 2.0f + 0.5f;
-        vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-        glBindVertexArray(VAO6);
-        glDrawArrays(GL_LINES, 0, 2160);
+            greenValue = sin(38) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO4);
+            glDrawArrays(GL_POINTS, 0, 2160);
 
 
-        greenValue = sin(68) / 2.0f + 0.5f;
-        vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-        glBindVertexArray(VAO7);
-        glDrawArrays(GL_LINES, 0, 2160);
+            greenValue = sin(48) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO5);
+            glDrawArrays(GL_POINTS, 0, 2160);
 
-        greenValue = sin(88) / 2.0f + 0.5f;
-        vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-        glBindVertexArray(VAO8);
-        glDrawArrays(GL_LINES, 0, 2160);
+            greenValue = sin(58) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO6);
+            glDrawArrays(GL_POINTS, 0, 2160);
 
+
+            greenValue = sin(68) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO7);
+            glDrawArrays(GL_POINTS, 0, 2160);
+
+            greenValue = sin(88) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO8);
+            glDrawArrays(GL_POINTS, 0, 2160);
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+            float greenValue = sin(0.5) / 2.0f + 0.5f;
+            int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
+            glBindVertexArray(VAO1);
+            glDrawArrays(GL_LINES, 0, 2160);
+
+
+            greenValue = sin(18) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO2);
+            glDrawArrays(GL_LINES, 0, 2160);
+
+            greenValue = sin(112) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO3);
+            glDrawArrays(GL_LINES, 0, 2160);
+
+
+            greenValue = sin(38) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO4);
+            glDrawArrays(GL_LINES, 0, 2160);
+
+
+            greenValue = sin(48) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO5);
+            glDrawArrays(GL_LINES, 0, 2160);
+
+            greenValue = sin(58) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO6);
+            glDrawArrays(GL_LINES, 0, 2160);
+
+
+            greenValue = sin(68) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO7);
+            glDrawArrays(GL_LINES, 0, 2160);
+
+            greenValue = sin(88) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO8);
+            glDrawArrays(GL_LINES, 0, 2160);
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
+            float greenValue = sin(0.5) / 2.0f + 0.5f;
+            int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
+            glBindVertexArray(VAO1);
+            glDrawArrays(GL_LINES, 0, 2160);
+
+
+            greenValue = sin(18) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO2);
+            glDrawArrays(GL_POINTS, 0, 2160);
+
+            greenValue = sin(112) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO3);
+            glDrawArrays(GL_LINES, 0, 2160);
+
+
+            greenValue = sin(38) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO4);
+            glDrawArrays(GL_POINTS, 0, 2160);
+
+
+            greenValue = sin(48) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO5);
+            glDrawArrays(GL_LINES, 0, 2160);
+
+            greenValue = sin(58) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO6);
+            glDrawArrays(GL_POINTS, 0, 2160);
+
+
+            greenValue = sin(68) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO7);
+            glDrawArrays(GL_LINES, 0, 2160);
+
+            greenValue = sin(88) / 2.0f + 0.5f;
+            vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+            glBindVertexArray(VAO8);
+            glDrawArrays(GL_POINTS, 0, 2160);
+        }
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
