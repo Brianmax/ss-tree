@@ -7,6 +7,7 @@ Teclas: S--> LINE_STRIP
 */
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "math.h"
 #include <iostream>
 
 using namespace std;
@@ -14,15 +15,18 @@ void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 const char *vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
+                                 "out vec4 vertexColor;\n"
                                  "void main()\n"
                                  "{\n"
-                                 " gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                    "gl_Position = vec4(aPos, 1.0);\n"
+                                    "vertexColor = vec4(0.5, 0.7, 0.1, 1.0);\n"
                                  "}\0";
 const char *fragmentShaderSource = "#version 330 core\n"
                                    "out vec4 FragColor;\n"
+                                   "uniform vec4 ourColor;\n"
                                    "void main()\n"
                                    "{\n"
-                                   "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                   "FragColor = ourColor;\n"
                                    "}\0";
 
 int main()
@@ -170,11 +174,36 @@ int main()
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
-        glClearColor(0.8f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
-        if(glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+        if(glfwGetKey(window, GLFW_KEY_G)) {
+            float timeValue = glfwGetTime();
+            float greenValue = (sin(timeValue) / 0.1f) + 0.5f;
+            int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUseProgram(shaderProgram);
+            glUniform4f(vertexColorLocation, 0.0f, 1.0, 0.5f, 0.31f);
+        }
+        if(glfwGetKey(window, GLFW_KEY_B))
+        {
+            float timeValue = glfwGetTime();
+            float blueValue = (sin(timeValue) / 0.0f) + 1.0f;
+            int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUseProgram(shaderProgram);
+            glUniform4f(vertexColorLocation, 0.1f, blueValue, 0.2f, 0.8f);
+        }
+        if(glfwGetKey(window, GLFW_KEY_R))
+        {
+            float timeValue = glfwGetTime();
+            float redValue = (sin(timeValue) / 0.0f) + 1.0f;
+            int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+            glUseProgram(shaderProgram);
+            glUniform4f(vertexColorLocation, 0.1f, redValue, 0.2f, 0.8f);
+        }
+
+        //Dibujo
+        if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
             glBindVertexArray(VAO1);
             glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -184,8 +213,7 @@ int main()
             glBindVertexArray(VAO3);
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
-
-        if(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+        if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
             glBindVertexArray(VAO4);
             glDrawArrays(GL_LINE_LOOP, 0, 10);
         }
@@ -198,7 +226,6 @@ int main()
             glBindVertexArray(VAO5);
             glDrawArrays(GL_POINTS, 0, 11);
         }
-
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
