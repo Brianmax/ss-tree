@@ -1,0 +1,29 @@
+local tool = script.Parent
+local scoop = tool.Scoop
+
+local backpack = tool.Parent
+local player = backpack.Parent
+local playerStats = player:FindFirstChild("leaderstats")
+local playerItems = playerStats:FindFirstChild("Objetos")
+local playerSpaces = playerStats:FindFirstChild("Espacios")
+
+local function onTouch(partTouched)
+    local Recolectable = partTouched.Parent:FindFirstChild("Recolectable")
+    if Recolectable then
+        if Recolectable.Value == true and playerItems.Value < playerSpaces.Value then
+            playerItems.Value = playerItems.Value + 1
+            Recolectable.Value = false
+            -- Hace que el objeto re-aparezca después de recolectarlo
+            partTouched.Transparency = 1 
+            partTouched.CanCollide = false
+            wait(5)
+            -- Hace que el objeto se pueda recolectar de nuevo
+            Recolectable.Value = true
+            partTouched.Transparency = 0 
+            partTouched.CanCollide = true
+            
+        end
+    end
+end
+
+scoop.Touched:Connect(onTouch)
