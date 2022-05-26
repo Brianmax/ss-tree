@@ -1,53 +1,167 @@
-#Creando los botones uno por uno.
-boton1 = Button(ventana, text="1", width=5, height=2, command= lambda:click(1)) #el botón tendra un cierto número como texto, así como un ancho y alto específico.
-boton2 = Button(ventana, text="2", width=5, height=2, command= lambda:click(2))
-boton3 = Button(ventana, text="3", width=5, height=2, command= lambda:click(3))
-boton4 = Button(ventana, text="4", width=5, height=2, command= lambda:click(4))
-boton5 = Button(ventana, text="5", width=5, height=2, command= lambda:click(5))
-boton6 = Button(ventana, text="6", width=5, height=2, command= lambda:click(6))
-boton7 = Button(ventana, text="7", width=5, height=2, command= lambda:click(7))
-boton8 = Button(ventana, text="8", width=5, height=2, command= lambda:click(8))
-boton9 = Button(ventana, text="9", width=5, height=2, command= lambda:click(9))
-boton0 = Button(ventana, text="0", width=13, height=2, command= lambda:click(0))  #el botón del número 0 tendrá un ancho especial ya que irá al final de todo.
+# -------------------------------------------------------------------------
+# Crack the Code
+# Aprendizaje por reforzamiento
+# -------------------------------------------------------------------------
+# Importar bibliotecas que se utilizarán - no modifiques esta sección
+import pygame
+from pygame.locals import *
+import numpy as np
+from time import sleep
+import laberintos
 
-#Los botones especiales para borrar, añadir paréntesis y un punto decimal.
-botonBorrar = Button(ventana, text="⌫", width=5, height=2, command= lambda:borrar())
-botonParentesis1 = Button(ventana, text="(", width=5, height=2, command= lambda:click("("))
-botonParentesis2 = Button(ventana, text=")", width=5, height=2, command= lambda:click(")"))
-botonPunto = Button(ventana, text=".", width=5, height=2, command= lambda:click("."))
+# -------------------------------------------------------------------------
+# Sesión 1: Laberintos, acciones y recompensas
 
-#Los botones de las operaciones matemáticas básicas.
-botonDiv = Button(ventana, text="÷", width=5, height=2, command= lambda:click("/"))
-botonMult = Button(ventana, text="×", width=5, height=2, command= lambda:click("*"))
-botonSuma = Button(ventana, text="+", width=5, height=2, command= lambda:click("+"))
-botonResta = Button(ventana, text="-", width=5, height=2, command= lambda:click("-"))
-botonIgual = Button(ventana, text="=", width=5, height=2, command= lambda:operacion())
+# Recompensas - Elige un laberinto para utilizarlo
+recompensas = laberintos.laberinto_1
 
-#Ubicar los botones en la pantalla
-#Agregando
-botonBorrar.grid(row=1, column=0, padx=5, pady=5)
-botonParentesis1.grid(row=1, column=1, padx=5, pady=5)
-botonParentesis2.grid(row=1, column=2, padx=5, pady=5)
-botonDiv.grid(row=1, column=3, padx=5, pady=5)
+# Tamaño del laberinto (recompensas)
+filas = recompensas.shape[0]
+columnas = recompensas.shape[1]
 
-boton7.grid(row=2, column=0, padx=5, pady=5)
-boton8.grid(row=2, column=1, padx=5, pady=5)
-boton9.grid(row=2, column=2, padx=5, pady=5)
-botonMult.grid(row=2, column=3, padx=5, pady=5)
+# Tamanos de imagen y ventana
+size = 32  # Es el tamano de las imagenes (jugador.jpg, meta.jpg, muro.jpg)
+ventana_alto = columnas * size
+ventana_ancho = filas * size
 
-boton4.grid(row=3, column=0, padx=5, pady=5)
-boton5.grid(row=3, column=1, padx=5, pady=5)
-boton6.grid(row=3, column=2, padx=5, pady=5)
-botonResta.grid(row=3, column=3, padx=5, pady=5)
+# Iniciar pygame y crear ventana
+pygame.init()
+ventana = pygame.display.set_mode((ventana_alto, ventana_ancho), pygame.HWSURFACE)
 
-boton1.grid(row=4, column=0, padx=5, pady=5)
-boton2.grid(row=4, column=1, padx=5, pady=5)
-boton3.grid(row=4, column=2, padx=5, pady=5)
-botonSuma.grid(row=4, column=3, padx=5, pady=5)
+# Cargar imagenes del muro, jugador y la meta
+img_muro = pygame.image.load("Imagenes/Muro.jpg").convert()
+img_jugador = pygame.image.load("Imagenes/Jugador.jpg").convert()
+img_meta = pygame.image.load("Imagenes/Meta.jpg").convert()
 
-boton0.grid(row=5, column=0, columnspan=2, padx=5, pady=5)
-botonPunto.grid(row=5, column=2, padx=5, pady=5)
-botonIgual.grid(row=5, column=3, padx=5, pady=5)
 
-#Bucle principal
-ventana.mainloop()
+# Función para dibujar el estado actual del laberinto y la posición del jugador
+def dibujar_laberinto(jugador_x, jugador_y):
+    for i in range(0, recompensas.shape[0]):
+        for j in range(0, recompensas.shape[1]):
+            if recompensas[i, j] == -100:
+                ventana.blit(img_muro, (j * size, i * size))
+            if recompensas[i, j] == 100:
+                ventana.blit(img_meta, (j * size, i * size))
+    ventana.blit(img_jugador, (jugador_y * size, jugador_x * size))
+
+
+# -------------------------------------------------------------------------
+# Sesión 2: Fin del juego, punto inicial y punto siguiente
+
+# Define la condición final
+# Si la recompensa es -1 (es una casilla vacia) entonces el juego sigue
+# Si choca con un muro (pierde) o llega a la meta (gana) el juego termina
+def fin_del_juego(fila_actual, columna_actual):
+    # Escribe aquí tu código
+    if recompensas[fila_actual, columna_actual] == -1:
+        return False
+    else:
+        return True
+
+
+# Inicia el juego desde una posición aleatoria
+def punto_inicial():
+    # Escribe aquí tu código
+    while True:
+        #Busca valor de fila y columnna donde empezar el juego
+        fila_actual = np.random.randint(filas)
+        columna_actual = np.random.randint(columnas)
+
+        #Si la posicion actual no es un muro o la meta deten la busqueda
+        if not fin_del_juego(fila_actual, columna_actual):
+            break
+    return fila_actual, columna_actual
+
+
+# Esta función nos ayuda a elegir una acción facilmente y calcular la nueva posición utilizando solo un numero
+def punto_siguiente(fila_actual, columna_actual, indice_de_accion):
+    # Escribe aquí tu código
+    nueva_fila = fila_actual
+    nueva_columna = columna_actual
+    acciones = ["arriba", "abajo", "derecha", "izquierda"]
+    #despues se modifica la fila o columna que corresponde a la accion
+    if acciones[indice_de_accion] == 'arriba' and fila_actual > 0:
+        nueva_fila == 1
+    elif acciones[indice_de_accion] == 'abajo' and fila_actual < filas - 1:
+        nueva_fila = nueva_fila + 1
+    elif acciones[indice_de_accion] == 'derecha' and columna_actual < columnas - 1:
+        nueva_columna = nueva_columna + 1
+    elif acciones[indice_de_accion] == 'izquierda' and columna_actual > 0:
+        nueva_columna = nueva_columna + 1
+    return nueva_fila, nueva_columna
+
+
+# -------------------------------------------------------------------------
+# Sesión 3: Entrenamiento
+
+# Tabla con los valores Q y parametros del entrenamiento
+# Escribe aquí tu codigo
+
+
+# Es una función que nos ayuda a explorar nuevas posibilidades o a utilizar el conocimiento que ya tenemos
+# para ello utiliza el parametro explorar, el cual es un porcentaje que nos ayuda a decidir que tantas veces vamos
+# a utilizar valores al azar y cuantas veces vamos a usar las mejores respuestas que tenemos
+def siguiente_accion(fila_actual, columna_actual, explorar):
+    # Escribe aquí tu código
+    pass
+
+
+# -------------------------------------------------------------------------
+# JUEGO - Este parte del código se modificará sesión a sesión
+
+# Posición inicial del jugador
+x = 5
+y = 10
+
+# Ciclo para mantener el juego abierto y poder intefactuar con el
+while True:
+    # Eventos para reconocer las teclas del teclado
+    pygame.event.pump()
+    keys = pygame.key.get_pressed()
+
+    # Acciones con las teclas del teclado (derecha, izquierda, arriba, abajo)
+    if keys[K_RIGHT]:
+        y += 1
+    if keys[K_LEFT]:
+        y -= 1
+    if keys[K_UP]:
+        x -= 1
+    if keys[K_DOWN]:
+        x += 1
+
+    # Espera y fondo
+    sleep(0.1)
+    ventana.fill((0, 0, 0))
+
+    # Diujar laberinto
+    dibujar_laberinto(x, y)
+    pygame.display.flip()
+
+    # Acción para cerrar la ventana
+    if keys[K_ESCAPE]:
+        break
+
+
+# -------------------------------------------------------------------------
+# Sesión 4 - Resultados del entrenamiento
+
+# Define una función que va a elegir siempre el camino más corto entre un punto inicial y la meta
+def camino_mas_corto(inicio_x, inicio_y):
+    # Escribe aquí tu codigo
+    pass
+
+
+# Dibuja el camino más corto desde una posición hasta la meta
+def dibuja_camino_mas_corto(inicio_x, inicio_y):
+    # Escribe aquí tu codigo
+    pass
+
+
+# Prueba tu inteligencia artificial para resolver el laberinto desde varias posiciones iniciales
+# Escribe aquí tu codigo
+
+
+# -------------------------------------------------------------------------
+# No borres esta linea, deja esto siempre hasta el final
+# Cierra el juego
+pygame.quit()
