@@ -99,47 +99,77 @@ def punto_siguiente(fila_actual, columna_actual, indice_de_accion):
 # -------------------------------------------------------------------------
 # Sesión 3: Entrenamiento
 
-# Tabla con los valores Q y parametros del entrenamiento
-# Escribe aquí tu codigo
+# Se crea una tabla con los valores Q (Q, de calidad en ingles "quality") que nos van a ayudar a decidir cual es la
+# mejor acción en cada casilla. Por eso vamos a tener 4 valores por cada fila y columna del laberinto (uno por cada
+# acción.
+valores_q = np.zeros((filas, columnas, 4))
+
+# Parametros del entrenamiento
+exploracion = 0.1   # Es un porcentaje de veces que vamos a probar algo nuevo (dejalo menor a 0.2 - 20%)
+descuento = 0.9  # Es un porcentaje con el que vamos a  de las recompensas futuras
+aprendizaje = 0.9  # Es la velocidad de aprendizaje, es decir, que tanto
 
 
 # Es una función que nos ayuda a explorar nuevas posibilidades o a utilizar el conocimiento que ya tenemos
 # para ello utiliza el parametro explorar, el cual es un porcentaje que nos ayuda a decidir que tantas veces vamos
 # a utilizar valores al azar y cuantas veces vamos a usar las mejores respuestas que tenemos
 def siguiente_accion(fila_actual, columna_actual, explorar):
-    # Escribe aquí tu código
-    pass
+    # if a randomly chosen value between 0 and 1 is less than epsilon,
+    # then choose the most promising value from the Q-table for this state.
+    if np.random.random() > explorar:
+        # Se usa la funcion argmax para descubrir la mejor acción (el número más alto)
+        return np.argmax(valores_q[fila_actual, columna_actual])
+    else:
+        # Se usa la funcion random para elegir un numero aleatorio
+        return np.random.randint(4)
 
 
 # -------------------------------------------------------------------------
 # JUEGO - Este parte del código se modificará sesión a sesión
 
-# Elegir punto inicial del juego al azar
-x, y = punto_inicial()
+# Entrena tu inteligencia artificial haciendo que resuelva el laberinto 1000 veces
+for episode in range(1000):
+    # Elegir punto inicial del juego al azar
+    x, y = punto_inicial()
 
-# Ciclo para mantener el juego abierto y poder intefactuar con el
-while True:
-    # Accion al azar usando la función punto_siguiente
-    accion = np.random.randint(4)
+    # Este ciclo va a mantener el juego abierto para poder intefactuar con el laberinto
+    while True:
+        # Guardar posición anterior
+        x_anterior = x
+        y_anterior = y
 
-    # Calcular siguiente punto
-    x, y = punto_siguiente(x, y, accion)
+        # Accion al azar usando la función siguiente_accion
+        accion = siguiente_accion(x, y, exploracion)
 
-    # Espera y fondo
-    sleep(0.4)  # Dejar mas tiempo para poder ver los resultados
-    ventana.fill((0, 0, 0))
+        # Calcular siguiente punto
+        x, y = punto_siguiente(x, y, accion)
 
-    # Diujar laberinto
-    dibujar_laberinto(x, y)
-    pygame.display.flip()
+        # Obtener valor q actual para esa accion en la posición anterior
+        valor_q_actual = valores_q[x_anterior, y_anterior, accion]
 
-    # Condición del fin del juego
-    if fin_del_juego(x, y):
-        if recompensas[x, y] == 100:
-            print("¡Has ganado!")
-        else:
-            print("¡Has perdido!")
-        break
+        # Calcular nuevo valor q
+        recompensa = recompensas[x, y]
+        temporal_difference = recompensa + (descuento * np.max(valores_q[x, y, :])) - valor_q_actual
+        nuevo_valor_q = valor_q_actual + (aprendizaje * temporal_difference)
+
+        # Actualizar nuevo valor q
+        valores_q[x_anterior, y_anterior, accion] = nuevo_valor_q
+        # Espera y fondo
+        ventana.fill((0, 0, 0))
+
+        # Diujar laberinto
+        dibujar_laberinto(x, y)
+        pygame.display.flip()
+
+        # Condición del fin del juego
+        if fin_del_juego(x, y):
+            if recompensas[x, y] == 100:
+                print("¡Has ganado!")
+            else:
+                print("¡Has perdido!")
+            break
+
+print('¡Entrenamiento completado!')
 
 
 # -------------------------------------------------------------------------
