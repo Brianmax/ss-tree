@@ -1,69 +1,96 @@
-import pygame
+# -------------------------------------------------------------------------
+# Crack the Code
+# Inteligencia Artificial con Python
+# Sesion 2 - Captura de datos
+# -------------------------------------------------------------------------
+# Importar bibliotecas que se utilizarán - no modifiques esta sección
+import cv2
+import os
+import imutils
+from camera import getcamera
 
+# Crear carpeta de persona:
+print('Escribe tu nombre: ')
+personName = input()
+dataPath = './data'
+personPath = dataPath + '/' + personName
 
-class Game:
-    screen = None
-    aliens = []
-    perdio = False
-    def __init__(self, width, height):
-        pygame.init()
-        self.width = width
-        self.height = height
-        self.screen = pygame.display.set_mode((width, height))
-        self.clock = pygame.time.Clock()
-        done = False
-        hero = Hero(self, width/2, height-20)
-        generator = Generator(self)
-        while not done:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    done = True
+# Muestra acción a tomar dependiendo del nombre agregado
+if os.path.exists(personPath):
+    print('Persona ya registrada, sobreescribiendo datos...')
+else:
+    os.makedirs(personPath)
+    print('Nueva persona, capturando datos...')
 
-            pygame.display.flip()
-            self.clock.tick(60)
-            self.screen.fill((0, 0, 0))
-            for alien in self.aliens:
-                alien.draw()
-            if not self.perdio:
-                hero.draw()
+# -------------------------------------------------------------------------
+# Escribe tu código aquí:
 
+# Actividad 0: instalar imutils
+# pip install imutils
 
-class Alien:
-    def __init__(self, game, x, y):
-        self.x = x
-        self.game = game
-        self.y = y
-        self.size = 30
+# Actividad 1: copia el codigo de la sesion 1
 
-    def draw(self):
-        pygame.draw.rect(self.game.screen,
-                         (81, 43, 88),
-                         pygame.Rect(self.x, self.y, self.size, self.size))
-        self.y += 0.05
+# Abrir camara web
+camera = getcamera()
+cap = cv2.VideoCapture(camera, cv2.CAP_DSHOW)
 
-class Generator:
-    def __init__(self, game):
-        margin = 30
-        width = 50
-        for x in range(margin, game.width - margin, width):
-            for y in range(margin, int(game.height / 2), width):
-                game.aliens.append(Alien(game, x, y))
+# Carga el archivo para utilizar el detector de rostros
+faceClassif = cv2.CascadeClassifier("rostros.xml")
 
+# Actividad 3a: Inicia contador (para set de entrenamiento)
+contador = 0
 
-class Hero:
-    def __init__(self, game, x, y):
-        self.x = x
-        self.game = game
-        self.y = y
-    def draw(self):
-        pygame.draw.rect(self.game.screen, (210,250, 251), pygame.Rect(self.x, self.y, 8,5))
+# Ciclo para tomar fotos de forma continua
+while True:
+    # Tomar fotografía
+    ret, frame = cap.read()
 
-class Rocket:
-    def __init__(self, game, x, y):
-        self.x = x
-        self.y = y
-        self.game = game
-    def draw(self):
-        pygame.draw.rect(self.game.screen, (254, 52, 110), pygame.Rect(self.x, self.y, 2, 4))
-if __name__ == '__main__':
-    game = Game(600, 400)
+    # Comprobar que exista una imagen
+    if not ret:
+        break
+
+    # Actividad 2: Cambia el tamaño de la foto tomada
+    frame = imutils.resize(frame, width=640)
+
+    # Crea una imagen en escala de grises a partir de la foto
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Utiliza el detector en la imagen de escala de grises
+    faces = faceClassif.detectMultiScale(gray,
+                                         scaleFactor=1.1,
+                                         minNeighbors=5,
+                                         minSize=(120, 120),
+                                         maxSize=(1000, 1000))
+
+    # Ciclo por cada rostro detectado en la imagen
+    for (x, y, w, h) in faces:
+        # Dibuja un rectángulo al rededor del rostro
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+        # Actividad 4a: Crea una copia de la imagen
+        auxFrame = frame.copy()
+
+        # Actividad 4b: Obtiene el recuadro del rostro
+        rostro = auxFrame[y:y + h, x:x + w]
+        rostro = cv2.resize(rostro, (150, 150), interpolation=cv2.INTER_CUBIC)
+
+        # Actividad 5: Guarda el rostro como imagen
+        cv2.imwrite(personPath + '/rotro_{}.jpg'.format(contador), rostro)
+        print('rotro_{}.jpg'.format(contador) + ' guardado')
+
+        # Actividad 3b: Incrementa el contador de imagenes
+        contador = contador + 1
+
+    # Mostrar la imagen en pantalla
+    cv2.imshow('frame', frame)
+
+    # Espera a que toques una tecla para cerrar la ventana
+    # Actividad 3c: termina el programa cuando el contador llegue a 300
+    if contador >= 300 or cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# --------------------------------------------------------------------------
+# Cierra la cámara y las ventanas - no borres estas lineas
+# Deja estas lineas hasta abajo
+cv2.destroyAllWindows()
+cap.release()
