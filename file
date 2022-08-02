@@ -1,29 +1,51 @@
-local tool = script.Parent
-local scoop = tool.Scoop
+-- Lets players click a button to buy an upgrade that increases MaxSpaces
 
-local backpack = tool.Parent
-local player = backpack.Parent
-local playerStats = player:FindFirstChild("leaderstats")
-local playerItems = playerStats:FindFirstChild("Objetos")
-local playerSpaces = playerStats:FindFirstChild("Espacios")
+local buyButton = script.Parent
 
-local function onTouch(partTouched)
-    local Recolectable = partTouched.Parent:FindFirstChild("Recolectable")
-    if Recolectable then
-        if Recolectable.Value == true and playerItems.Value < playerSpaces.Value then
-            playerItems.Value = playerItems.Value + 1
-            Recolectable.Value = false
-            -- Hace que el objeto re-aparezca después de recolectarlo
-            partTouched.Transparency = 1 
-            partTouched.CanCollide = false
-            wait(5)
-            -- Hace que el objeto se pueda recolectar de nuevo
-            Recolectable.Value = true
-            partTouched.Transparency = 0 
-            partTouched.CanCollide = true
-            
-        end
-    end
+local clickDetector = buyButton.ClickDetector
+
+
+
+-- Variables for the upgrade
+
+local newSpaces = 2
+
+local upgradeCost = 200
+
+
+
+local function giveUpgrade(player)
+
+	print("Botón clickeado")
+
+	-- Get's the player's leaderboard to get other IntValues
+
+	local playerStats = player:FindFirstChild("leaderstats")
+
+	-- Gets the player's money and spaces to make changes
+
+	local playerGold = playerStats:FindFirstChild("Oro")
+
+	local playerSpaces = playerStats:FindFirstChild("Espacios")
+
+
+
+	-- Checks if player has enough money to afford the upgrade
+
+	if playerGold.Value >= upgradeCost then
+
+		print("Se puede comprar")
+
+		-- Subtract the item's cost from the player's money
+
+		playerGold.Value = playerGold.Value - upgradeCost
+
+		playerSpaces.Value = playerSpaces.value + newSpaces
+
+	end
+
 end
 
-scoop.Touched:Connect(onTouch)
+
+
+clickDetector.MouseClick:Connect(giveUpgrade)
