@@ -25,7 +25,7 @@ class Game:
                 self.gano = True
                 self.displayText("Victory achieved")
             pressed = pygame.key.get_pressed()
-            if pressed[pygame.K_LEFT]:  
+            if pressed[pygame.K_LEFT]:
                 hero.x -= 2 if hero.x > 20 else 0
             elif pressed[pygame.K_RIGHT]:
                 hero.x += 2 if hero.x < width - 20 else 0
@@ -35,12 +35,10 @@ class Game:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and not self.perdio:
                     self.rockets.append(Rocket(self, hero.x, hero.y))
 
-            # A = True
-            # NOT A  ---> False
             pygame.display.flip()
             self.clock.tick(60)
-            self.screen.fill((0, 0, 0))
-
+            self.screen.fill((5, 0, 0))
+            #self.screen.blit(self.fondo, (0,0))
             for alien in self.aliens:
                 alien.draw()
                 alien.checkCollision(self)
