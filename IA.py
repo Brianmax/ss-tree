@@ -1,132 +1,183 @@
+# -------------------------------------------------------------------------
+# Crack the Code
+# Aprendizaje por reforzamiento
+# -------------------------------------------------------------------------
+# Importar bibliotecas que se utilizarán - no modifiques esta sección
 import pygame
+from pygame.locals import *
+import numpy as np
+from time import sleep
+import laberintos
 
-class Game:
-    screen = None
-    aliens = []
-    rockets = []
-    perdio = False
-    gano = False
+# -------------------------------------------------------------------------
+# Sesión 1: Laberintos, acciones y recompensas
 
-    def __init__(self, width, height, dificultad):
-        pygame.init()
-        self.width = width
-        self.height = height
-        self.screen = pygame.display.set_mode((width, height))
-        self.clock = pygame.time.Clock()
-        self.fondo = pygame.image.load("fondo.png")
-        pygame.mixer.music.load("song.wav")
-        pygame.mixer.music.play(-1)
-        pygame.mixer.music.set_volume(0.2)
-        done = False
+# Recompensas y tamaño del laberinto
+# Escribe aquí tu código
+recompensas = laberintos.laberinto_1
+# Tamanos de imagen y ventana
+# Escribe aquí tu código
+filas = recompensas.shape[0]
+columnas = recompensas.shape[1]
+# Iniciar pygame y crear ventana
+# Escribe aquí tu código
+size = 32
+ventana_alto = columnas*size
+ventana_ancho = filas*size
+pygame.init()
+ventana = pygame.display.set_mode((ventana_alto, ventana_ancho), pygame.HWSURFACE)
+# Cargar imagenes del muro, jugador y la meta
+# Escribe aquí tu código
+img_muro = pygame.image.load("Imagenes/Muro.jpg").convert()
+img_player = pygame.image.load("Imagenes/Jugador.jpg").convert()
+img_meta = pygame.image.load("Imagenes/Meta.jpg").convert()
 
-        hero = Hero(self, width / 2, height - 20)
-        generator = Generator(self, dificultad)
-        rocket = None
+# Función para dibujar el estado actual del laberinto y la posición del jugador
+def dibujar_laberinto(jugador_x, jugador_y):
+    # Escribe aquí tu código
+    for i in range(0, recompensas.shape[0]):
+        for j in range(0, recompensas.shape[1]):
+            if recompensas[i,j] ==-100:
+                ventana.blit(img_muro, (j*size, i*size))
+            if recompensas[i,j] == 100:
+                ventana.blit(img_meta, (j*size, i*size))
+        ventana.blit(img_player, (jugador_y*size, jugador_x*size))
+# -------------------------------------------------------------------------
+# Sesión 2: Fin del juego, punto inicial y punto siguiente
 
-        while not done:
-            if len(self.aliens) == 0:
-                self.gano = True
-                self.displayText("Victory achieved")
-            pressed = pygame.key.get_pressed()
-            if pressed[pygame.K_LEFT]:
-                hero.x -= 2 if hero.x > 20 else 0
-            elif pressed[pygame.K_RIGHT]:
-                hero.x += 2 if hero.x < width - 20 else 0
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    done = True
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and not self.perdio:
-                    self.rockets.append(Rocket(self, hero.x, hero.y))
-
-            pygame.display.flip()
-            self.clock.tick(60)
-            self.screen.blit(self.fondo, (0,0))
-            for alien in self.aliens:
-                alien.draw()
-                alien.checkCollision(self)
-                if (alien.y > height):
-                    self.perdio = True
-                    self.displayText("You died")
-
-            for rocket in self.rockets:
-                if not self.perdio:
-                    rocket.draw()
-                if rocket.y <= 0:
-                    self.rockets.remove(rocket)
-            if not self.perdio:
-                hero.draw()
+# Define la condición final
+# Si la recompensa es -1 (es una casilla vacia) entonces el juego sigue
+# Si choca con un muro (pierde) o llega a la meta (gana) el juego termina
+def fin_del_juego(fila_actual, columna_actual):
+    # Escribe aquí tu código
+    if recompensas[fila_actual, columna_actual] == -1:
+        return False
+    else:
+        return True
 
 
-    def displayText(self, text):
-            pygame.font.init()
-            font = pygame.font.SysFont('Arial', 50)
-            textsurface = font.render(text, False, (255, 255, 255))
-            self.screen.blit(textsurface, (100, 160))
+# Inicia el juego desde una posición aleatoria
+def punto_inicial():
+    # Escribe aquí tu código
+    while True:
+        fila_actual = np.random.randint(filas)
+        columna_actual = np.random.randint(columnas)
+
+        if not fin_del_juego(fila_actual, columna_actual):
+            break
+    return fila_actual, columna_actual
 
 
+# Esta función nos ayuda a elegir una acción facilmente y calcular la nueva posición utilizando solo un numero
+def punto_siguiente(fila_actual, columna_actual, indice_de_accion):
+    nueva_fila = fila_actual
+    nueva_columna = columna_actual
+
+    acciones = ['arriba', 'derecha', 'abajo', 'izquierda']
+
+    if acciones[indice_de_accion] == 'arriba' and fila_actual > 0:
+        nueva_fila -= 1
+    elif acciones[indice_de_accion] == 'derecha'  and columna_actual < columnas - 1:
+        nueva_columna += 1
+    elif acciones[indice_de_accion] == 'abajo' and fila_actual < filas - 1:
+        nueva_fila += 1
+    elif acciones[indice_de_accion] == 'izquierda' and columna_actual > 0:
+        nueva_columna -= 1
+
+    return nueva_fila, nueva_columna
 
 
-class Alien:
-    def __init__(self, game, x, y, velocidad):
-        self.x = x
-        self.game = game
-        self.y = y
-        self.size = 30
-        self.velocity = velocidad
-        self.image = pygame.image.load("alien.png")
+# -------------------------------------------------------------------------
+# Sesión 3: Entrenamiento
 
-    def draw(self):
-        #pygame.draw.rect(self.game.screen,
-                         #(81, 43, 88),
-                         #pygame.Rect(self.x, self.y, self.size, self.size))
-        self.game.screen.blit(self.image, (self.x, self.y))
-        self.y += self.velocity
-    def checkCollision(self, game):
-        for rocket in game.rockets:
-            if (rocket.x < self.x + self.size and
-                    rocket.x > self.x - self.size and
-                    rocket.y < self.y + self.size and
-                    rocket.y > self.y - self.size):
-                game.rockets.remove(rocket)
-                game.aliens.remove(self)
+# Tabla con los valores Q y parametros del entrenamiento
+# Escribe aquí tu codigo
+valores_q = np.zeros((filas, columnas, 4))
+exploracion = 0.1
+descuento = 0.9
+aprendizaje = 0.9
+# Es una función que nos ayuda a explorar nuevas posibilidades o a utilizar el conocimiento que ya tenemos
+# para ello utiliza el parametro explorar, el cual es un porcentaje que nos ayuda a decidir que tantas veces vamos
+# a utilizar valores al azar y cuantas veces vamos a usar las mejores respuestas que tenemos
+def siguiente_accion(fila_actual, columna_actual, explorar):
+
+    if np.random.random() > explorar:
+        return np.argmax(valores_q[fila_actual, columna_actual])
+    else:
+        return np.random.randint(4)
 
 
-class Hero:
-    def __init__(self, game, x, y):
-        self.x = x
-        self.game = game
-        self.y = y
-    def draw(self):
-        pygame.draw.rect(self.game.screen,(210, 250, 251),pygame.Rect(self.x, self.y, 8, 5))
+# -------------------------------------------------------------------------
+# JUEGO - Este parte del código se modificará sesión a sesión
+
+# Escribe tu codigo aquí
+for episode in range(1000):
+    x,y = punto_inicial()
+
+    while True:
+        x_anterior = x
+        y_anterior = y
+
+        accion = siguiente_accion(x,y,exploracion)
+        x,y = punto_siguiente(x,y, accion)
+        valor_q_actual = valores_q[x_anterior, y_anterior, accion]
+
+        recompensa = recompensas[x,y]
+        temporal_difference = recompensa + (descuento*np.max(valores_q[x, y, :])) - valor_q_actual
+        nuevo_valor_q  = valor_q_actual + (aprendizaje*temporal_difference)
+
+        valores_q[x_anterior, y_anterior, accion] = nuevo_valor_q
+
+        ventana.fill((0,0,0))
+
+        pygame.display.flip()
+
+        if fin_del_juego(x, y):
+            if recompensas[x,y] == 100:
+                print("Has ganado")
+            else:
+                print("Has perdido")
+            break
+    print("Entrenamiento completado")
+# -------------------------------------------------------------------------
+# Sesión 4 - Resultados del entrenamiento
+
+# Define una función que va a elegir siempre el camino más corto entre un punto inicial y la meta
+def camino_mas_corto(inicio_x, inicio_y):
+    if fin_del_juego(inicio_x, inicio_y):
+        return []
+
+    fila_actual, columna_actual = inicio_x, inicio_y
+    camino = [[fila_actual, columna_actual]]
+
+    while not fin_del_juego(fila_actual, columna_actual):
+        accion_actual = siguiente_accion(fila_actual, columna_actual, 0)
+
+        fila_actual, columna_actual = punto_siguiente(fila_actual, columna_actual, accion_actual)
+
+        camino.append([fila_actual, columna_actual])
+    return camino
+
+# Dibuja el camino más corto desde una posición hasta la meta
+def dibuja_camino_mas_corto(inicio_x, inicio_y):
+    camino = camino_mas_corto(inicio_x, inicio_y)
+
+    for i, j in camino:
+        dibujar_laberinto(i,j)
+        ventana.fill((0,0,0))
+        dibujar_laberinto(i,j)
+        pygame.display.flip()
+        sleep(0.1)
 
 
-class Rocket:
-    def __init__(self, game, x, y):
-        self.x = x
-        self.y = y
-        self.game = game
-
-    def draw(self):
-        pygame.draw.rect(self.game.screen,
-                         (254, 52, 110),
-                         pygame.Rect(self.x, self.y, 2, 4))
-        self.y -= 2
+# Prueba tu inteligencia artificial para resolver el laberinto desde varias posiciones iniciales
+# Escribe aquí tu codigo
+for ejemplo in range(10):
+    x, y = punto_inicial()
+    dibuja_camino_mas_corto(x,y)
 
 
-class Generator:
-    def __init__(self, game, velocity):
-        margin = 30
-        width = 50
-        for x in range(margin, game.width - margin, width):
-            for y in range(margin, int(game.height / 2), width):
-                game.aliens.append(Alien(game, x, y, velocity))
-
-
-def easy():
-    Game(600,400, 0.1)
-def medium():
-    Game(600, 400, 0.2)
-def hard():
-    Game(600, 400, 0.3)
-if __name__ == '__main__':
-    game = Game(600, 400, 0.8)
+# -------------------------------------------------------------------------
+# No borres esta linea, deja esto siempre hasta el final
+# Cierra el juego
+pygame.quit()
