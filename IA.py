@@ -41,6 +41,22 @@ while True:
     #Separar a la persona de la imagen original
 
     persona = np.zeros(frame.shape, np.uint8)
+    for e in range(3):
+        persona[:, :, e] = cv2.bitwise_and(frame[:, :, e], binaria)
+
+    imshow("Persona", persona)
+    #Leer imagen de fondo y cambiar tamaño para que sea el mismo
+
+    fondo = cv2.imread("./img/fondo.jpg")
+    fondo = cv2.resize(fondo, binaria.shape[::-1])
+
+    #obtener el fondo con el espacio de la persona
+
+    for e in range(3):
+        fondo[:,:,e] = cv2.bitwise_and(fondo[:,:,e], cv2.bitwise_not(binaria))
+    
+    persona += fondo
+    imshow("Persona", persona)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
