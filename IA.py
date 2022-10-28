@@ -1,86 +1,49 @@
-# -------------------------------------------------------------------------
-# Crack the Code
-# Inteligencia Artificial con Python
-# -------------------------------------------------------------------------
-# Importar bibliotecas que se utilizarán - no modifiques esta sección
-import cv2
-import os
-from camera import getcamera
+boton1 = Button(root, text="1", width=5, height=2, command= lambda:click(1)) #el botón tendra un cierto número como texto, así como un ancho y alto específico.
+boton2 = Button(root, text="2", width=5, height=2, command= lambda:click(2))
+boton3 = Button(root, text="3", width=5, height=2, command= lambda:click(3))
+boton4 = Button(root, text="4", width=5, height=2, command= lambda:click(4))
+boton5 = Button(root, text="5", width=5, height=2, command= lambda:click(5))
+boton6 = Button(root, text="6", width=5, height=2, command= lambda:click(6))
+boton7 = Button(root, text="7", width=5, height=2, command= lambda:click(7))
+boton8 = Button(root, text="8", width=5, height=2, command= lambda:click(8))
+boton9 = Button(root, text="9", width=5, height=2, command= lambda:click(9))
+boton0 = Button(root, text="0", width=13, height=2, command= lambda:click(0))  #el botón del número 0 tendrá un ancho especial ya que irá al final de todo.
 
-# Estructura del codigo - busca donde empezar tu código no modifiques el resto
+#Los botones especiales para borrar, añadir paréntesis y un punto decimal.
+botonBorrar = Button(root, text="⌫", width=5, height=2, command= lambda:remove())
+botonParentesis1 = Button(root, text="(", width=5, height=2, command= lambda:click("("))
+botonParentesis2 = Button(root, text=")", width=5, height=2, command= lambda:click(")"))
+botonPunto = Button(root, text=".", width=5, height=2, command= lambda:click("."))
 
-# Encontrar nombres de las personas guardadas
-dataPath = './data'
-imagePaths = os.listdir(dataPath)
-print('imagePaths=', imagePaths)
+#Los botones de las operaciones matemáticas básicas.
+botonDiv = Button(root, text="÷", width=5, height=2, command= lambda:click("/"))
+botonMult = Button(root, text="×", width=5, height=2, command= lambda:click("*"))
+botonSuma = Button(root, text="+", width=5, height=2, command= lambda:click("+"))
+botonResta = Button(root, text="-", width=5, height=2, command= lambda:click("-"))
+botonIgual = Button(root, text="=", width=5, height=2, command= lambda:operacion())
 
-# Creando el modelo y leyendo el modelo
-# noinspection PyUnresolvedReferences
-face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-face_recognizer.read('modelo.xml')
+#Ubicar los botones en la pantalla
+#Agregando
+botonBorrar.grid(row=1, column=0, padx=5, pady=5)
+botonParentesis1.grid(row=1, column=1, padx=5, pady=5)
+botonParentesis2.grid(row=1, column=2, padx=5, pady=5)
+botonDiv.grid(row=1, column=3, padx=5, pady=5)
 
-# Crear clasificador de rostros
-faceClassif = cv2.CascadeClassifier('rostros.xml')
+boton7.grid(row=2, column=0, padx=5, pady=5)
+boton8.grid(row=2, column=1, padx=5, pady=5)
+boton9.grid(row=2, column=2, padx=5, pady=5)
+botonMult.grid(row=2, column=3, padx=5, pady=5)
 
-# Abrir camara:
-camera = getcamera()
-cap = cv2.VideoCapture(camera, cv2.CAP_DSHOW)
+boton4.grid(row=3, column=0, padx=5, pady=5)
+boton5.grid(row=3, column=1, padx=5, pady=5)
+boton6.grid(row=3, column=2, padx=5, pady=5)
+botonResta.grid(row=3, column=3, padx=5, pady=5)
 
-# Utiliza la camara hasta que la tecla q es presionada
-while True:
-    # Toma una fotografía y la muestra en pantalla
-    ret, frame = cap.read()
+boton1.grid(row=4, column=0, padx=5, pady=5)
+boton2.grid(row=4, column=1, padx=5, pady=5)
+boton3.grid(row=4, column=2, padx=5, pady=5)
+botonSuma.grid(row=4, column=3, padx=5, pady=5)
 
-    # comprobar que exista una imagen
-    if not ret:
-        break
-
-    # Crea una imagen en escala de grises a partir de la foto
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-    # Crea una copia de la imagen en blanco y negro
-    auxFrame = gray.copy()
-
-    # Utiliza el detector en la imagen de escala de grises
-    faces = faceClassif.detectMultiScale(gray, 1.3, 5)
-
-    # -------------------------------------------------------------------------
-    # Escribe tu código aquí:
-
-    # Procesamiento por cada rostro reconocido
-    for (x, y, w, h) in faces:
-
-        # Extraer rostro de la imagen original
-        rostro = auxFrame[y:y + h, x:x + w]
-
-        # Modificar tamaño de la imagen (150x150)
-        rostro = cv2.resize(rostro, (150, 150))
-
-        # Utilizar el modelo entrenado para diferenciar el rostro
-        result = face_recognizer.predict(rostro)
-
-        # Anotar resultados numéricos en pantalla
-        cv2.putText(frame, '{}'.format(result), (x, y - 5), 1, 1, (255, 255, 0))
-
-        # Mostrar resultados escritos en pantalla
-        if result[1] < 75:
-            # Escribe el nombre de la persona identificada arriba de su rostro
-            cv2.putText(frame, '{}'.format(imagePaths[result[0]]), (x, y - 25), 2, 1, (0, 255, 0))
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)  # Crea rectangulo verde
-        else:
-            # Escribe la palabra desconocido si no se identifica a ninguna persona
-            cv2.putText(frame, 'Desconocido', (x, y - 20), 2, 1, (0, 0, 255))
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)  # Crea rectangulo rojo
-
-    # -------------------------------------------------------------------------
-    # No modifiques el codigo debajo de esta linea:
-    cv2.imshow('frame', frame)
-
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-# --------------------------------------------------------------------------
-# Cierra la cámara y las ventanas - no borres estas lineas
-# Deja estas lineas hasta abajo
-cv2.destroyAllWindows()
-cap.release()
+boton0.grid(row=5, column=0, columnspan=2, padx=5, pady=5)
+botonPunto.grid(row=5, column=2, padx=5, pady=5)
+botonIgual.grid(row=5, column=3, padx=5, pady=5)
