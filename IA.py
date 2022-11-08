@@ -1,82 +1,92 @@
 # -------------------------------------------------------------------------
 # Crack the Code
 # Inteligencia Artificial con Python
+# Sesion 2 - Captura de datos
 # -------------------------------------------------------------------------
 # Importar bibliotecas que se utilizarán - no modifiques esta sección
 import cv2
 import os
+import imutils
 from camera import getcamera
 
-# Estructura del codigo - busca donde empezar tu código no modifiques el resto
-
-# Encontrar nombres de las personas guardadas
+# Crear carpeta de persona:
+print('Escribe tu nombre: ')
+personName = input()
 dataPath = './data'
-imagePaths = os.listdir(dataPath)
-print('imagePaths=', imagePaths)
+personPath = dataPath + '/' + personName
 
-# Creando el modelo y leyendo el modelo
-# noinspection PyUnresolvedReferences
-face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-face_recognizer.read('modelo.xml')
+# Muestra acción a tomar dependiendo del nombre agregado
+if os.path.exists(personPath):
+    print('Persona ya registrada, sobreescribiendo datos...')
+else:
+    os.makedirs(personPath)
+    print('Nueva persona, capturando datos...')
 
-# Crear clasificador de rostros
-faceClassif = cv2.CascadeClassifier('rostros.xml')
+# -------------------------------------------------------------------------
+# Escribe tu código aquí:
 
-# Abrir camara:
+# Actividad 0: instalar imutils
+# pip install imutils
+
+# Actividad 1: copia el codigo de la sesion 1
+
+# Abrir camara web
 camera = getcamera()
 cap = cv2.VideoCapture(camera, cv2.CAP_DSHOW)
 
-# Utiliza la camara hasta que la tecla q es presionada
+# Carga el archivo para utilizar el detector de rostros
+faceClassif = cv2.CascadeClassifier("rostros.xml")
+
+# Actividad 3a: Inicia contador (para set de entrenamiento)
+contador = 0
+
+# Ciclo para tomar fotos de forma continua
 while True:
-    # Toma una fotografía y la muestra en pantalla
+    # Tomar fotografía
     ret, frame = cap.read()
 
-    # comprobar que exista una imagen
+    # Comprobar que exista una imagen
     if not ret:
         break
+
+    # Actividad 2: Cambia el tamaño de la foto tomada
+    frame = imutils.resize(frame, width=640)
 
     # Crea una imagen en escala de grises a partir de la foto
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # Crea una copia de la imagen en blanco y negro
-    auxFrame = gray.copy()
-
     # Utiliza el detector en la imagen de escala de grises
-    faces = faceClassif.detectMultiScale(gray, 1.3, 5)
+    faces = faceClassif.detectMultiScale(gray,
+                                         scaleFactor=1.1,
+                                         minNeighbors=5,
+                                         minSize=(120, 120),
+                                         maxSize=(1000, 1000))
 
-    # -------------------------------------------------------------------------
-    # Escribe tu código aquí:
-
-    # Procesamiento por cada rostro reconocido
+    # Ciclo por cada rostro detectado en la imagen
     for (x, y, w, h) in faces:
+        # Dibuja un rectángulo al rededor del rostro
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        # Extraer rostro de la imagen original
+        # Actividad 4a: Crea una copia de la imagen
+        auxFrame = frame.copy()
+
+        # Actividad 4b: Obtiene el recuadro del rostro
         rostro = auxFrame[y:y + h, x:x + w]
+        rostro = cv2.resize(rostro, (150, 150), interpolation=cv2.INTER_CUBIC)
 
-        # Modificar tamaño de la imagen (150x150)
-        rostro = cv2.resize(rostro, (150, 150))
+        # Actividad 5: Guarda el rostro como imagen
+        cv2.imwrite(personPath + '/rotro_{}.jpg'.format(contador), rostro)
+        print('rotro_{}.jpg'.format(contador) + ' guardado')
 
-        # Utilizar el modelo entrenado para diferenciar el rostro
-        result = face_recognizer.predict(rostro)
+        # Actividad 3b: Incrementa el contador de imagenes
+        contador = contador + 1
 
-        # Anotar resultados numéricos en pantalla
-        cv2.putText(frame, '{}'.format(result), (x, y - 5), 1, 1, (255, 255, 0))
-
-        # Mostrar resultados escritos en pantalla
-        if result[1] < 75:
-            # Escribe el nombre de la persona identificada arriba de su rostro
-            cv2.putText(frame, '{}'.format(imagePaths[result[0]]), (x, y - 25), 2, 1, (0, 255, 0))
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)  # Crea rectangulo verde
-        else:
-            # Escribe la palabra desconocido si no se identifica a ninguna persona
-            cv2.putText(frame, 'Desconocido', (x, y - 20), 2, 1, (0, 0, 255))
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)  # Crea rectangulo rojo
-
-    # -------------------------------------------------------------------------
-    # No modifiques el codigo debajo de esta linea:
+    # Mostrar la imagen en pantalla
     cv2.imshow('frame', frame)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    # Espera a que toques una tecla para cerrar la ventana
+    # Actividad 3c: termina el programa cuando el contador llegue a 300
+    if contador >= 300 or cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 # --------------------------------------------------------------------------
