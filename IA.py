@@ -16,6 +16,9 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     done = True
+            pygame.display.flip()
+            self.clock.tick(60)
+            self.screen.fill((0,0,0))
 
 class Alien:
     def __init__(self, game, pos_x, pos_y):
