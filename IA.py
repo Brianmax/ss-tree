@@ -12,6 +12,8 @@ class Game:
         self.clock = pygame.time.Clock()
         done = False
 
+        hero = Hero(self, width / 2, height - 20)
+
         while not done:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -42,3 +44,11 @@ class Hero:
     def draw(self):
         pygame.draw.rect(self.game.screen, (210,250,251),
                          pygame.Rect(self.pos_x, self.pos_y, self.size,self.size))
+
+class Generator:
+    def __init__(self, game):
+        margin = 30
+        width = 50
+        for x in range(margin, game.width-margin, width):
+            for y in range(margin, int(game.height/2), width):
+                game.aliens.append(Alien(game, x, y))
