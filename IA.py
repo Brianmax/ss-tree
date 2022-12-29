@@ -1,27 +1,27 @@
 #Creando los botones uno por uno.
-boton1 = Button(ventana, text="1", width=5, height=2, command= lambda:click(1)) #el botón tendra un cierto número como texto, así como un ancho y alto específico.
-boton2 = Button(ventana, text="2", width=5, height=2, command= lambda:click(2))
-boton3 = Button(ventana, text="3", width=5, height=2, command= lambda:click(3))
-boton4 = Button(ventana, text="4", width=5, height=2, command= lambda:click(4))
-boton5 = Button(ventana, text="5", width=5, height=2, command= lambda:click(5))
-boton6 = Button(ventana, text="6", width=5, height=2, command= lambda:click(6))
-boton7 = Button(ventana, text="7", width=5, height=2, command= lambda:click(7))
-boton8 = Button(ventana, text="8", width=5, height=2, command= lambda:click(8))
-boton9 = Button(ventana, text="9", width=5, height=2, command= lambda:click(9))
-boton0 = Button(ventana, text="0", width=13, height=2, command= lambda:click(0))  #el botón del número 0 tendrá un ancho especial ya que irá al final de todo.
+boton1 = Button(calculadora, text="1", width=5, height=2, command= lambda:click(1)) #el botón tendra un cierto número como texto, así como un ancho y alto específico.
+boton2 = Button(calculadora, text="2", width=5, height=2, command= lambda:click(2))
+boton3 = Button(calculadora, text="3", width=5, height=2, command= lambda:click(3))
+boton4 = Button(calculadora, text="4", width=5, height=2, command= lambda:click(4))
+boton5 = Button(calculadora, text="5", width=5, height=2, command= lambda:click(5))
+boton6 = Button(calculadora, text="6", width=5, height=2, command= lambda:click(6))
+boton7 = Button(calculadora, text="7", width=5, height=2, command= lambda:click(7))
+boton8 = Button(calculadora, text="8", width=5, height=2, command= lambda:click(8))
+boton9 = Button(calculadora, text="9", width=5, height=2, command= lambda:click(9))
+boton0 = Button(calculadora, text="0", width=13, height=2, command= lambda:click(0))  #el botón del número 0 tendrá un ancho especial ya que irá al final de todo.
 
 #Los botones especiales para borrar, añadir paréntesis y un punto decimal.
-botonBorrar = Button(ventana, text="⌫", width=5, height=2, command= lambda:borrar())
-botonParentesis1 = Button(ventana, text="(", width=5, height=2, command= lambda:click("("))
-botonParentesis2 = Button(ventana, text=")", width=5, height=2, command= lambda:click(")"))
-botonPunto = Button(ventana, text=".", width=5, height=2, command= lambda:click("."))
+botonBorrar = Button(calculadora, text="⌫", width=5, height=2, command= lambda:borrar())
+botonParentesis1 = Button(calculadora, text="(", width=5, height=2, command= lambda:click("("))
+botonParentesis2 = Button(calculadora, text=")", width=5, height=2, command= lambda:click(")"))
+botonPunto = Button(calculadora, text=".", width=5, height=2, command= lambda:click("."))
 
 #Los botones de las operaciones matemáticas básicas.
-botonDiv = Button(ventana, text="÷", width=5, height=2, command= lambda:click("/"))
-botonMult = Button(ventana, text="×", width=5, height=2, command= lambda:click("*"))
-botonSuma = Button(ventana, text="+", width=5, height=2, command= lambda:click("+"))
-botonResta = Button(ventana, text="-", width=5, height=2, command= lambda:click("-"))
-botonIgual = Button(ventana, text="=", width=5, height=2, command= lambda:operacion())
+botonDiv = Button(calculadora, text="÷", width=5, height=2, command= lambda:click("/"))
+botonMult = Button(calculadora, text="×", width=5, height=2, command= lambda:click("*"))
+botonSuma = Button(calculadora, text="+", width=5, height=2, command= lambda:click("+"))
+botonResta = Button(calculadora, text="-", width=5, height=2, command= lambda:click("-"))
+botonIgual = Button(calculadora, text="=", width=5, height=2, command= lambda:operacion())
 
 #Ubicar los botones en la pantalla
 #Agregando
