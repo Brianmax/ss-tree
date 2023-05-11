@@ -1,48 +1,70 @@
-import youtube_dl
-import discord
-from discord.ext import commands
+# -------------------------------------------------------------------------
+# Crack the Code
+# Inteligencia Artificial con Python
+# Sesion 2 - Captura de datos
+# -------------------------------------------------------------------------
+# Importar bibliotecas que se utilizarán - no modifiques esta sección
+import cv2
+import os
+import imutils
+from camera import getcamera
 
-class music(commands.Cog):
+# Crear carpeta de persona:
+print('Escribe tu nombre: ')
+personName = input()
+dataPath = './data'
+personPath = dataPath + '/' + personName
 
-    def __init__(self,client):
-        self.client = client
+# Muestra acción a tomar dependiendo del nombre agregado
+if os.path.exists(personPath):
+    print('Persona ya registrada, sobreescribiendo datos...')
+else:
+    os.makedirs(personPath)
+    print('Nueva persona, capturando datos...')
 
-    @commands.command()
-    async def join(self,contexto):
-        if contexto.author.voice is None:
-            await contexto.send("No estás en un canal de voz!")
-        voice_channel = contexto.author.voice.channel
-        if contexto.voice_client is None:
-            await voice_channel.connect()
-        else:
-            await contexto.voice_client.move_to(voice_channel)
+# -------------------------------------------------------------------------
+# Escribe tu código aquí:
 
-    @commands.command()
-    async def disconnect(self,contexto):
-        await contexto.voice_client.disconnect()
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
-    @commands.command()
-    async def play(self, contexto, url):
-        contexto.voice_client.stop()
-        FFMPEG_OPTIONS = {"before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5","options": "-vn"}
-        YDL_OPTIONS = {"format": "bestaudio"}
-        vc = contexto.voice_client
-        #url = url[1:-1]
-        with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
-            info = ydl.extract_info(url, download=False)
-            url2 = info["formats"][0]["url"]
-            vc.play(discord.FFmpegPCMAudio(executable="C:/webm/bin/ffmpeg.exe", source=url2, **FFMPEG_OPTIONS))
+faceClassif = cv2.CascadeClassifier("rostros.xml")
 
+contador = 0
 
-    @commands.command()
-    async def pause(self, contexto):
-        await contexto.voice_client.pause()
+while True:
+    ret, frame = cap.read()
 
+    if not ret:
+        break
 
-    @commands.command()
-    async def resume(self, contexto):
-        await contexto.voice_client.resume()
+    frame = imutils.resize(frame, width=640)
 
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-def setup(client):
-    client.add_cog(music(client))
+    faces = faceClassif.detectMultiScale(gray,
+                                         scaleFactor =  1.1,
+                                         minNeighbors = 5,
+                                         minSize = (120,120),
+                                         maxSize = (1000, 1000))
+    for (x, y, w, h) in faces:
+        cv2.rectangle(frame, (x,y), (x+w,y+h),(0,255, 0), 2)
+
+        auxFrame = frame.copy()
+        rostro = auxFrame[y:y+h, x:x+w]
+        rostro = cv2.resize(rostro, (150,150),interpolation=cv2.INTER_CUBIC)
+
+        cv2.imwrite(personPath+"/rostro_{}.jpg".format(contador), rostro)
+        print("rostor_{}.jpg".format(contador) + " guardado")
+
+        contador= contador + 1
+
+    cv2.imshow("frame", frame)
+
+    if contador >=300 or cv2.waitKey(1) & 0xFF == ord("q"):
+        break
+
+# --------------------------------------------------------------------------
+# Cierra la cámara y las ventanas - no borres estas lineas
+# Deja estas lineas hasta abajo
+cv2.destroyAllWindows()
+cap.release()
